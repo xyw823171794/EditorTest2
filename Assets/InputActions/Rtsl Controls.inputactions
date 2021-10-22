@@ -1,0 +1,33 @@
+{
+    "name": "Rtsl Controls",
+    "maps": [
+        {
+            "name": "DemoInput",
+            "id": "b57b019a-db5a-405c-9924-8de7f2ba692b",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "a98c11a7-3582-41a8-9be1-fa621fc89d56",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7151820d-fd59-4177-892e-758a0fb29e63",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
