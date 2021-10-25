@@ -13,13 +13,27 @@ namespace Battlehub.Cubeman
 {
     public class CubemenGame : MonoBehaviour
     {
+        /// <summary>
+        /// 分数文本
+        /// </summary>
         public Text TxtScore;
+        /// <summary>
+        /// 完成文本
+        /// </summary>
         public Text TxtCompleted;
+        /// <summary>
+        /// 提示文本
+        /// </summary>
         public Text TxtTip;
         public Button BtnReplay;
         public GameObject GameUI;
-
+        /// <summary>
+        /// 得分
+        /// </summary>
         private int m_score;
+        /// <summary>
+        /// 角色数
+        /// </summary>
         private int m_total;
         /// <summary>
         /// 是否游戏结束
@@ -242,7 +256,9 @@ namespace Battlehub.Cubeman
                 GameUI.SetActive(false);
             }
         }
-
+        /// <summary>
+        /// 重置游戏
+        /// </summary>
         private void RestartGame()
         {
             if (m_activeCharacters != null)
@@ -262,7 +278,7 @@ namespace Battlehub.Cubeman
         private void InitializeGame(GameCharacter[] characters, int activeCharacterIndex)
         {
             m_gameOver = false;
-            if(m_cameraFollow)
+            if(m_cameraFollow)//摄像机跟随
             {
                 m_playerCamera = FindObjectOfType<GameCameraFollow>();
                 if (m_playerCamera == null)
@@ -272,7 +288,7 @@ namespace Battlehub.Cubeman
                         m_playerCamera = Camera.main.gameObject.AddComponent<GameCameraFollow>();
                     }
                 }
-
+                //基于摄像机屏幕的UI
                 if (m_playerCamera != null)
                 {
                     Canvas canvas = GetComponentInChildren<Canvas>();
@@ -299,6 +315,7 @@ namespace Battlehub.Cubeman
                 }
                 else
                 {
+                    //标记为销毁
                     ExposeToEditor[] children = character.GetComponentsInChildren<ExposeToEditor>(true);
                     for (int j = 0; j < children.Length; ++j)
                     {
@@ -312,7 +329,7 @@ namespace Battlehub.Cubeman
             m_total = m_activeCharacters.Count;
             m_score = 0;
 
-            if (m_total == 0)
+            if (m_total == 0)//可控制角色数为零，代表游戏结束
             {
                 TxtCompleted.gameObject.SetActive(true);
                 TxtScore.gameObject.SetActive(false);
@@ -328,10 +345,10 @@ namespace Battlehub.Cubeman
                 TxtTip.gameObject.SetActive(true);
                 UpdateScore();
 
-                if(activeCharacterIndex >= 0)
+                if(activeCharacterIndex >= 0)//当前激活的角色索引
                 {
                     m_current = m_activeCharacters[activeCharacterIndex];
-                    if (m_current != null)
+                    if (m_current != null)//若当前显示角色不为空
                     {
                         ActivatePlayer();
                     }
@@ -346,7 +363,10 @@ namespace Battlehub.Cubeman
                 }
             }
         }
-
+        /// <summary>
+        /// 保存游戏角色到实例
+        /// </summary>
+        /// <param name="characters"></param>
         private void SaveCharactersInInitalState(GameCharacter[] characters)
         {
             GameCharacter[] storedCharacters = new GameCharacter[characters.Length];
@@ -355,7 +375,7 @@ namespace Battlehub.Cubeman
                 GameCharacter character = characters[i];
                 bool isActive = character.gameObject.activeSelf;
                 character.gameObject.SetActive(false);
-
+                //再创建一个实例
                 GameCharacter stored = Instantiate(character, character.transform.position, character.transform.rotation);
                 stored.name = character.name;
                 character.gameObject.SetActive(isActive);
@@ -363,6 +383,7 @@ namespace Battlehub.Cubeman
                 ExposeToEditor[] exposeToEditor = stored.GetComponentsInChildren<ExposeToEditor>();
                 foreach(ExposeToEditor obj in exposeToEditor)
                 {
+                    //标记为销毁
                     obj.MarkAsDestroyed = true;
                 }
 
@@ -512,7 +533,7 @@ namespace Battlehub.Cubeman
                     m_current.HandleInput = true;
                 }
             }
-            if (m_playerCamera != null)
+            if (m_playerCamera != null)//摄像机跟随
             {
                 m_playerCamera.target = m_current.transform;
                 m_playerCamera.Follow();

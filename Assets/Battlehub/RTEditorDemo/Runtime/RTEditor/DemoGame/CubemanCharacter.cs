@@ -11,22 +11,43 @@ namespace Battlehub.Cubeman
 		public float m_StationaryTurnSpeed = 180;
 		public float m_JumpPower = 12f;
 		[Range(1f, 4f)]public float m_GravityMultiplier = 2f;
-        public float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
+		/// <summary>
+		/// 特定于示例资产中的角色，需要修改以与其他人一起使用 
+		/// </summary>
+		public float m_RunCycleLegOffset = 0.2f; //specific to the character in sample assets, will need to be modified to work with others
         public float m_MoveSpeedMultiplier = 1f;
         public float m_AnimSpeedMultiplier = 1f;
         public float m_GroundCheckDistance = 0.1f;
 
 		Rigidbody m_Rigidbody;
 		Animator m_Animator;
+		/// <summary>
+		/// 是否在地面上
+		/// </summary>
 		bool m_IsGrounded;
 		float m_OrigGroundCheckDistance;
 		const float k_Half = 0.5f;
 		float m_TurnAmount;
 		float m_ForwardAmount;
+		/// <summary>
+		/// 地面法线
+		/// </summary>
 		Vector3 m_GroundNormal;
+		/// <summary>
+		/// 胶囊体高度
+		/// </summary>
 		float m_CapsuleHeight;
+		/// <summary>
+		/// 胶囊体中心
+		/// </summary>
 		Vector3 m_CapsuleCenter;
+		/// <summary>
+		/// 胶囊体碰撞
+		/// </summary>
 		CapsuleCollider m_Capsule;
+		/// <summary>
+		/// 是否蹲下
+		/// </summary>
 		bool m_Crouching;
 
         public bool Enabled;
@@ -38,7 +59,7 @@ namespace Battlehub.Cubeman
             m_Capsule = GetComponent<CapsuleCollider>();
             m_CapsuleHeight = m_Capsule.height;
             m_CapsuleCenter = m_Capsule.center;
-            m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
+            m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;//冻结旋转
             m_OrigGroundCheckDistance = m_GroundCheckDistance;
         }
 
@@ -62,13 +83,16 @@ namespace Battlehub.Cubeman
 		{
             if (Enabled)
             {
-                // convert the world relative moveInput vector into a local-relative
-                // turn amount and forward amount required to head in the desired
-                // direction.
-                if (move.magnitude > 1f) move.Normalize();
-                move = transform.InverseTransformDirection(move);
-                CheckGroundStatus();
-                move = Vector3.ProjectOnPlane(move, m_GroundNormal);
+				// convert the world relative moveInput vector into a local-relative
+				// turn amount and forward amount required to head in the desired
+				// direction.
+				// 将世界相对 moveInput 向量转换为本地相对向量
+				// 转向所需的量和前进量
+				// 方向。 
+				if (move.magnitude > 1f) move.Normalize();//单位化
+                move = transform.InverseTransformDirection(move);//将move向量转到transform的本地空间里
+                CheckGroundStatus();//更新在地面上的状态
+                move = Vector3.ProjectOnPlane(move, m_GroundNormal);//得到平行于地面的移动向量
                 m_TurnAmount = Mathf.Atan2(move.x, move.z);
                 m_ForwardAmount = move.z;
 
@@ -141,7 +165,7 @@ namespace Battlehub.Cubeman
 		void UpdateAnimator(Vector3 move)
 		{
 			// update the animator parameters
-           
+			// 更新动画参数 
 			m_Animator.SetFloat("Forward", m_ForwardAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetFloat("Turn", m_TurnAmount, 0.1f, Time.deltaTime);
 			m_Animator.SetBool("Crouch", m_Crouching);
@@ -154,6 +178,9 @@ namespace Battlehub.Cubeman
 			// calculate which leg is behind, so as to leave that leg trailing in the jump animation
 			// (This code is reliant on the specific run cycle offset in our animations,
 			// and assumes one leg passes the other at the normalized clip times of 0.0 and 0.5)
+			// 计算哪条腿在后面，以便在跳跃动画中让那条腿在后面
+			//（此代码依赖于我们动画中的特定运行周期偏移量，
+			// 并假设一条腿以 0.0 和 0.5 的标准化剪辑时间通过另一条腿） 
 			float runCycle =
 				Mathf.Repeat(
 					m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime + m_RunCycleLegOffset, 1);
@@ -227,16 +254,21 @@ namespace Battlehub.Cubeman
 			}
 		}
 
-
+		/// <summary>
+		/// 更新在地面的状态
+		/// </summary>
 		void CheckGroundStatus()
 		{
 			RaycastHit hitInfo;
 #if UNITY_EDITOR
 			// helper to visualise the ground check ray in the scene view
+			// 在场景视图中可视化地面检查射线的助手 
 			Debug.DrawLine(transform.position + (Vector3.up * 0.1f), transform.position + (Vector3.up * 0.1f) + (Vector3.down * m_GroundCheckDistance));
 #endif
 			// 0.1f is a small offset to start the ray from inside the character
 			// it is also good to note that the transform position in the sample assets is at the base of the character
+			// 0.1f 是从字符内部开始光线的小偏移量
+			// 同样值得注意的是，示例资产中的变换位置位于角色的底部 
 			if (Physics.Raycast(transform.position + (Vector3.up * 0.1f), Vector3.down, out hitInfo, m_GroundCheckDistance))
             {
                 m_GroundCheckDistance = m_OrigGroundCheckDistance;

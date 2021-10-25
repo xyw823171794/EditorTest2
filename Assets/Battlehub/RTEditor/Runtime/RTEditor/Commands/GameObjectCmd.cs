@@ -104,7 +104,8 @@ namespace Battlehub.RTEditor
                         go = new GameObject();
                         go.SetActive(false);
                         go.name = m_localization.GetString("ID_RTEditor_GameObjectCmd_Camera", "Camera");
-                        go.AddComponent<Camera>();
+                        Camera camera =  go.AddComponent<Camera>();
+                        camera.stereoTargetEye = StereoTargetEyeMask.None;
                         go.AddComponent<GameViewCamera>();
                     }
                     break;
